@@ -11,12 +11,12 @@
         "zh-CN": "像素庄园控件与原创四季场景，默认按访客浏览器日期切换；三网筛选排序、线路变化提醒、解锁档案及30天Ping。",
         "en": "Farm-style theme with seasons, 30-day Ping history and saved network quality reports."
       },
-      "version": "2.2.0",
+      "version": "2.2.1",
       "author": "pickarm · 原作者 Planck",
       "url": "https://github.com/pickarm/komari-themes",
-      "preview": "https://github.com/pickarm/komari-themes/releases/download/v2.2.0/preview.png",
-      "download": "https://github.com/pickarm/komari-themes/releases/download/v2.2.0/pickarm-junimo-v2.2.0.zip",
-      "sha256": "fb2890ff6e0fdf0958a20e7fcb7906018ebb9a384b378eb0f6de82b41d5c8c59"
+      "preview": "https://github.com/pickarm/komari-themes/releases/download/v2.2.1/preview.png",
+      "download": "https://github.com/pickarm/komari-themes/releases/download/v2.2.1/pickarm-junimo-v2.2.1.zip",
+      "sha256": "7d9f419932ff439d2f151489114b6ca12c0ee20b1919b57ffb74927f1aafbe01"
     }
   ]
 }
