@@ -114,3 +114,5 @@
 .nq-route-table .nq-route-changed { box-shadow: inset 4px 0 #af7834; }
 .nq-route-change { display: flex; flex-direction: column; gap: 3px; margin: 6px 0; padding-left: 8px; border-left: 2px solid #af7834; font-size: 11px; color: var(--text-secondary); line-height: 1.7; overflow-wrap: anywhere; }
 .nq-route-change strong { color: var(--text-primary); }
+
+.nq-empty-title { display: block; font-size: 15px; font-weight: 650; color: var(--text-primary); margin-bottom: 8px; }

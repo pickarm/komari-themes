@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { RouteChangeNotice, RouteTable } from "@/components/instance/NetworkQualityPanel";
-import { PROVINCES, CARRIERS, type NetworkReport } from "../networkQuality";
+import { NetworkQualityErrorState, RouteChangeNotice, RouteTable } from "@/components/instance/NetworkQualityPanel";
+import { PROVINCES, CARRIERS, NetworkUnavailable, type NetworkReport } from "../networkQuality";
 const report: NetworkReport = { id: "test", uuid: "test", startedAt: "", completedAt: "", status: "succeeded", ipv: "both", unlocks: [], errors: [], routes: PROVINCES.flatMap((province) => CARRIERS.map((carrier) => ({ province, carrier, family: 4, packetType: "large", line: "<script>alert(1)</script>", latency: 0, loss: 0, sent: 30, received: 30, status: "ok" }))) };
 describe("route table rendering", () => {
   it("renders all 93 cells with zeroes and treats upstream output as text", () => {
@@ -37,5 +37,20 @@ describe("route change notice", () => {
     expect(renderToStaticMarkup(<RouteChangeNotice report={{ ...report, routeComparison: { compared: 0, changes: [] } }} />)).toContain("先建立对比基线");
     expect(renderToStaticMarkup(<RouteChangeNotice report={{ ...report, routeComparison: { compared: 5, changes: [] } }} />)).toContain("已对比 5 个有效目标");
     expect(renderToStaticMarkup(<RouteChangeNotice report={{ ...report, routes: [] }} />)).toBe("");
+  });
+});
+
+describe("visitor empty state", () => {
+  it("names the plugin and configuration action when the integration is unavailable", () => {
+    const html = renderToStaticMarkup(<NetworkQualityErrorState error={new NetworkUnavailable()} />);
+    expect(html).toContain("暂未配置网络检测");
+    expect(html).toContain("网络检测与历史报告");
+    expect(html).toContain("公开展示设置");
+  });
+  it("never displays raw parser/transport errors, even when an unknown exception reaches the view", () => {
+    const html = renderToStaticMarkup(<NetworkQualityErrorState error={new SyntaxError(`Unexpected token '<', '<!DOCTYPE' is not valid JSON`)} />);
+    expect(html).toContain("暂时无法读取检测记录");
+    expect(html).not.toContain("Unexpected");
+    expect(html).not.toContain("DOCTYPE");
   });
 });

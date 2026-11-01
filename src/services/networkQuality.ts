@@ -42,20 +42,41 @@ export const NetworkPublicSchema = z.discriminatedUnion("enabled", [
 export type NetworkReport = z.infer<typeof NetworkReportSchema>;
 export type NetworkRoute = z.infer<typeof NetworkRouteSchema>;
 export type NetworkPublic = z.infer<typeof NetworkPublicSchema>;
-export class NetworkUnavailable extends Error {}
+export class NetworkQualityError extends Error {}
+export class NetworkUnavailable extends NetworkQualityError {
+  constructor() {
+    super("如尚未安装，请先安装并启用“网络检测与历史报告”插件；已安装时，请检查插件运行状态和公开展示设置。");
+  }
+}
 
 export async function getNetworkQuality(uuid: string, reportId: string, signal?: AbortSignal): Promise<NetworkPublic> {
   const query = new URLSearchParams({ uuid });
   if (reportId) query.set("report_id", reportId);
-  const response = await fetchWithTimeout(`/api/plugins/network-quality/v1/public?${query}`, {
-    method: "GET", credentials: "same-origin", headers: { Accept: "application/json" },
-  }, 15_000, signal);
-  if (response.status === 404) throw new NetworkUnavailable("暂无公开检测结果，请在后台检查网络检测插件与节点的公开设置。");
-  if (!response.ok) throw new Error("检测历史暂时无法读取，请稍后重试。");
-  const result = NetworkPublicSchema.safeParse(await response.json());
-  if (!result.success) throw new Error("检测结果格式不兼容，请更新网络检测插件。");
+  let response: Response;
+  let body: string;
+  try {
+    response = await fetchWithTimeout(`/api/plugins/network-quality/v1/public?${query}`, {
+      method: "GET", credentials: "same-origin", headers: { Accept: "application/json" },
+    }, 15_000, signal);
+    body = await response.text();
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new NetworkQualityError("暂时无法连接网络检测服务，请稍后刷新。");
+  }
+  if (response.status === 404) throw new NetworkUnavailable();
+  if (!response.ok) throw new NetworkQualityError("检测记录暂时无法读取，请稍后刷新。");
+  // Komari's SPA fallback can return index.html with HTTP 200 when the plugin route is absent.
+  // Treat that as an unavailable integration, never expose a JSON parser exception to visitors.
+  if (!body.trim() || /^\s*(?:<!doctype\s+html\b|<html\b)/i.test(body) || response.headers.get("content-type")?.toLowerCase().includes("text/html")) {
+    throw new NetworkUnavailable();
+  }
+  let payload: unknown;
+  try { payload = JSON.parse(body); }
+  catch { throw new NetworkQualityError("检测数据暂时无法读取，请稍后刷新或联系管理员检查插件。"); }
+  const result = NetworkPublicSchema.safeParse(payload);
+  if (!result.success) throw new NetworkQualityError("网络检测暂不可用，请管理员检查插件版本和设置。");
   if (result.data.enabled && (result.data.node.uuid !== uuid || (result.data.latest && result.data.latest.uuid !== uuid))) {
-    throw new Error("检测结果与当前节点不匹配。");
+    throw new NetworkQualityError("检测结果与当前节点不匹配，请稍后刷新。");
   }
   return result.data;
 }

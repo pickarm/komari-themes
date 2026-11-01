@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Archive, RefreshCw, Sprout } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { InstancePanel } from "./InstancePanel";
-import { CARRIERS, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, provinceName, reportAge, reportTime, routeFor, routeHealth, routeSummary, visibleProvinces, type NetworkReport, type RouteSort } from "@/services/networkQuality";
+import { CARRIERS, NetworkQualityError, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, provinceName, reportAge, reportTime, routeFor, routeHealth, routeSummary, visibleProvinces, type NetworkReport, type RouteSort } from "@/services/networkQuality";
 
 const REPORT_LABELS = { succeeded: "检测完成", partial: "部分完成", failed: "检测失败" };
 const ROUTE_LABELS = { ok: "正常", "no-response": "无响应", failed: "检测失败", unsupported: "不支持" };
@@ -13,6 +13,14 @@ function EmptyArchive({ children, loading = false }: { children: React.ReactNode
   return <div className="nq-empty" role="status"><Sprout size={28} aria-hidden="true" className={loading ? "nq-leaf-loading" : undefined} /><p>{children}</p></div>;
 }
 
+
+export function NetworkQualityErrorState({ error }: { error: unknown }) {
+  const unavailable = error instanceof NetworkUnavailable;
+  return <EmptyArchive>
+    <strong className="nq-empty-title">{unavailable ? "暂未配置网络检测" : "暂时无法读取检测记录"}</strong>
+    <span>{error instanceof NetworkQualityError ? error.message : "请稍后刷新；若持续无法读取，请联系管理员检查网络检测插件。"}</span>
+  </EmptyArchive>;
+}
 
 export function RouteChangeNotice({ report }: { report: NetworkReport }) {
   if (!report.routes.length) return null;
@@ -100,8 +108,8 @@ export function NetworkQualityPanel({ uuid }: { uuid: string }) {
     description="把每一次线路与解锁检测，收进庄园的观测手册。"
     aside={<button type="button" className="nq-refresh" onClick={() => void query.refetch()} disabled={query.isFetching} aria-label="刷新检测历史"><RefreshCw size={14} aria-hidden="true" />{query.isFetching ? "读取中" : "刷新档案"}</button>}>
     {query.isLoading && <EmptyArchive loading>正在翻阅检测档案…</EmptyArchive>}
-    {query.isError && <EmptyArchive>{query.error.message}</EmptyArchive>}
-    {query.data?.enabled === false && <EmptyArchive>网络检测已关闭。开启后，检测结果会保存在这里。</EmptyArchive>}
+    {query.isError && <NetworkQualityErrorState error={query.error} />}
+    {query.data?.enabled === false && <EmptyArchive><strong className="nq-empty-title">网络检测暂未开放</strong><span>请管理员启用“网络检测与历史报告”插件，并开启公开展示。</span></EmptyArchive>}
     {data && <>
       <div className="nq-toolbar">
         <label className="nq-history"><span><Archive size={14} aria-hidden="true" />检测记录</span><select aria-label="检测记录" value={reportId} onChange={(event) => setReportId(event.target.value)}>
@@ -110,7 +118,7 @@ export function NetworkQualityPanel({ uuid }: { uuid: string }) {
         </select></label>
         {report && <span className={`nq-status is-${report.status}`}>{REPORT_LABELS[report.status]}</span>}
       </div>
-      {!report && <EmptyArchive>还没有检测记录。管理员完成首次检测后，这里会展示结果。</EmptyArchive>}
+      {!report && <EmptyArchive><strong className="nq-empty-title">暂无检测记录</strong><span>网络检测插件已连接；管理员完成首次检测后，这里会显示结果。</span></EmptyArchive>}
       {report && <>
         <div className="nq-report-meta"><span>检测完成于 <time dateTime={report.completedAt}>{reportTime(report.completedAt)}</time></span><span>{reportId ? "历史报告 · " : ""}{age?.label}</span></div>
         {age?.stale && <p className="nq-notice">这份报告已超过 24 小时，仅供历史参考，不代表当前网络状态。</p>}

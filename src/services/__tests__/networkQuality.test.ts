@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NetworkPublicSchema, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, reportAge, routeFor, routeHealth, routeSummary, visibleProvinces, type NetworkRoute } from "../networkQuality";
+import { NetworkPublicSchema, NetworkQualityError, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, reportAge, routeFor, routeHealth, routeSummary, visibleProvinces, type NetworkRoute } from "../networkQuality";
 
 const report = {
   id: "run-1", uuid: "node-a", startedAt: "2026-11-01T00:00:00Z", completedAt: "2026-11-01T00:02:00Z",
@@ -98,5 +98,37 @@ describe("network archive presentation", () => {
     expect(reportAge("2026-11-02T02:59:40Z", now)).toEqual({ label: "刚刚归档", stale: false });
     expect(reportAge("not-a-date", now).label).toBe("检测时间待核实");
     expect(reportAge("2026-12-01T00:00:00Z", now).label).toBe("检测时间待核实");
+  });
+});
+
+describe("unconfigured and unreadable plugin responses", () => {
+  it.each([
+    ["<!DOCTYPE html><html><body>Komari</body></html>", "text/html"],
+    ["  <HTML lang='zh-CN'>Komari</HTML>", "application/json"],
+    ["<div>Plugin not found</div>", "text/html; charset=utf-8"],
+    ["", "application/json"],
+  ])("treats successful HTML/empty fallback as unconfigured (%s)", async (body, type) => {
+    const fetch = vi.fn().mockResolvedValue(new Response(body, { headers: { "content-type": type } }));
+    vi.stubGlobal("fetch", fetch);
+    await expect(getNetworkQuality("node-a", "")).rejects.toBeInstanceOf(NetworkUnavailable);
+    expect(fetch.mock.calls[0][1].method).toBe("GET");
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+  it("keeps malformed JSON and server failure distinct from missing integration", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response('{"version":')));
+    await expect(getNetworkQuality("node-a", "")).rejects.toThrow("检测数据暂时无法读取");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("<html>proxy failure</html>", { status: 502, headers: { "content-type": "text/html" } })));
+    await expect(getNetworkQuality("node-a", "")).rejects.toThrow("检测记录暂时无法读取");
+  });
+  it("converts transport failures into controlled Chinese messages without exposing raw errors", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch SECRET_PROXY_DIAGNOSTIC")));
+    await expect(getNetworkQuality("node-a", "")).rejects.toThrow("暂时无法连接网络检测服务");
+    await expect(getNetworkQuality("node-a", "")).rejects.toBeInstanceOf(NetworkQualityError);
+  });
+  it("preserves parent cancellation", async () => {
+    const signal = AbortSignal.abort();
+    const error = new DOMException("cancelled", "AbortError");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(error));
+    await expect(getNetworkQuality("node-a", "", signal)).rejects.toBe(error);
   });
 });
