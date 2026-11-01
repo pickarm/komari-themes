@@ -56,6 +56,9 @@ export function resolveHomeOverviewDense(
 }
 
 export interface ResolvedThemeSettings {
+  farmSeason: "auto" | "spring" | "summer" | "autumn" | "winter";
+  farmAnimations: boolean;
+  showNetworkQuality: boolean;
   defaultAppearance: Appearance;
   desktopNodeViewMode: NodeViewMode;
   mobileNodeViewMode: NodeViewMode;
@@ -105,6 +108,9 @@ export interface ResolvedThemeSettings {
 }
 
 export const DEFAULT_THEME_SETTINGS: ResolvedThemeSettings = {
+  farmSeason: "auto",
+  farmAnimations: true,
+  showNetworkQuality: true,
   defaultAppearance: "farm",
   desktopNodeViewMode: "large",
   mobileNodeViewMode: "compact",
@@ -219,6 +225,10 @@ export function normalizeThemeSettings(
     settings?.homepageMultiPingTaskIds,
   );
   return {
+    farmSeason: ["spring", "summer", "autumn", "winter"].includes(String(settings?.farmSeason))
+      ? settings!.farmSeason as ResolvedThemeSettings["farmSeason"] : "auto",
+    farmAnimations: settings?.farmAnimations !== false,
+    showNetworkQuality: settings?.showNetworkQuality !== false,
     defaultAppearance: normalizeAppearance(settings?.defaultAppearance),
     desktopNodeViewMode: normalizeNodeViewMode(
       settings?.desktopNodeViewMode,

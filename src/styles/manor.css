@@ -1,0 +1,32 @@
+/* Original vector/CSS details extending the upstream farm skin. No game assets. */
+:root[data-appearance="farm"] :is(.instance-panel, .surface-card) {
+  box-shadow: 0 4px 0 #6f42204d, inset 0 0 0 1px #fff5cf66;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 4px, #a86a3405 4px, #a86a3405 5px);
+}
+:root[data-appearance="farm"] .instance-panel-title {
+  font-family: var(--farm-title-font); font-weight: 400; font-size: 18px; color: #593716;
+}
+:root[data-appearance="farm"] .instance-panel-header { border-bottom: 1px dashed #a6783c66; padding-bottom: 12px; margin-bottom: 16px; }
+:root[data-appearance="farm"] .instance-panel-kicker { color: #807135; letter-spacing: 1px; }
+:root[data-appearance="farm"] :is(.instance-segmented, .nq-tabs > div, .nq-mobile-carriers) { background: #e6cc9040; padding: 4px; border-radius: 5px; }
+:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .farm-setting-select, .nq-history select) {
+  border: 2px solid #ad7a42; border-radius: 4px; box-shadow: inset 1px 1px #fff8da, 0 2px 0 #75462244;
+}
+:root[data-appearance="farm"] :is(.nq-tabs button, .nq-mobile-carriers button)[aria-pressed="true"] { background: #e7c071; border-color: #774824; color: #4a2c17; }
+:root[data-appearance="farm"] .nq-route-table thead th { background: #e8d29b; }
+:root[data-appearance="farm"] .nq-route-table th:first-child { background: #f3e3b8; }
+:root[data-appearance="farm"] .nq-unlock-card { border: 2px solid #c8a365; box-shadow: inset 1px 1px #fff7d5; border-radius: 4px; }
+:root[data-appearance="farm"] .nq-unlock-card strong { font-family: var(--farm-title-font); font-size: 15px; font-weight: 400; }
+:root[data-appearance="farm"] .nq-status { border-radius: 3px; background: #fff5cf66; }
+:root[data-appearance="farm"] :is(.nq-route-table, .nq-unlock-card, .nq-history) { color: var(--text-primary); }
+:root[data-appearance="farm"][data-farm-season="spring"] { --farm-accent: #88964b; }
+:root[data-appearance="farm"][data-farm-season="summer"] { --farm-accent: #62843d; }
+:root[data-appearance="farm"][data-farm-season="autumn"] { --farm-accent: #b87b37; }
+:root[data-appearance="farm"][data-farm-season="winter"] { --farm-accent: #7c9294; }
+:root[data-appearance="farm"][data-farm-scene="dusk"] .instance-panel-title { color: var(--text-primary); }
+:root[data-appearance="farm"][data-farm-motion="on"] .network-quality-panel .instance-panel-kicker svg { animation: manor-sprout 5s ease-in-out infinite; transform-origin: bottom; }
+@keyframes manor-sprout { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@media(prefers-reduced-motion: reduce) {
+  :root[data-appearance="farm"] *, :root[data-appearance="farm"] *::before, :root[data-appearance="farm"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+:root[data-farm-motion="off"][data-appearance="farm"] *, :root[data-farm-motion="off"][data-appearance="farm"] *::before, :root[data-farm-motion="off"][data-appearance="farm"] *::after { animation: none !important; }

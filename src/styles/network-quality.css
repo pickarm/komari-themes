@@ -1,0 +1,54 @@
+.network-quality-panel { min-width: 0; }
+.network-quality-panel .instance-panel-kicker { display: flex; align-items: center; gap: 7px; }
+.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .farm-setting-select, .nq-history select {
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-primary);
+  border-radius: 7px; padding: 7px 11px; font-size: 12px;
+}
+.nq-refresh { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; }
+.nq-refresh:disabled, .nq-tabs button:disabled { opacity: .45; cursor: default; }
+.nq-toolbar, .nq-tabs, .nq-report-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.nq-toolbar { margin-bottom: 14px; }
+.nq-history { display: flex; align-items: center; gap: 10px; font-size: 12px; min-width: 0; }
+.nq-history select { max-width: 100%; }
+.nq-status { padding: 4px 9px; border: 1px solid currentColor; border-radius: 5px; font-size: 11px; }
+.nq-status.is-succeeded, .nq-unlock-status.is-available { color: #267049; }
+.nq-status.is-partial, .nq-warning, .nq-unlock-status.is-restricted { color: #a06110; }
+.nq-status.is-failed { color: #bc3f36; }
+.nq-report-meta { color: var(--text-tertiary); font-size: 11px; margin-bottom: 15px; }
+.nq-tabs { padding-bottom: 15px; }
+.nq-tabs > div { display: flex; gap: 6px; }
+.nq-tabs button[aria-pressed="true"], .nq-mobile-carriers button[aria-pressed="true"] { background: var(--surface-elev); border-color: var(--text-secondary); font-weight: 650; }
+.nq-table-wrap { max-height: 620px; overflow: auto; border: 1px solid var(--border-subtle); border-radius: 6px; scrollbar-gutter: stable; }
+.nq-route-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 12px; }
+.nq-route-table th, .nq-route-table td { padding: 11px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-subtle); }
+.nq-route-table th:first-child { width: 75px; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+.nq-route-table thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-elev); }
+.nq-route-table thead th:first-child { z-index: 3; }
+.nq-route-table thead small { display: block; margin-top: 4px; font-weight: 400; color: var(--text-tertiary); }
+.nq-route-table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-sunken) 35%, transparent); }
+.nq-route-line { display: block; overflow-wrap: anywhere; line-height: 1.6; }
+.nq-route-metrics { display: flex; flex-wrap: wrap; gap: 5px 15px; margin-top: 5px; color: var(--text-secondary); font-family: var(--font-mono); font-size: 11px; }
+.nq-muted { display: block; color: var(--text-tertiary); line-height: 1.7; }
+.nq-mobile-carriers { display: none; }
+.nq-unlock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.nq-unlock-card { padding: 15px; border: 1px solid var(--border-subtle); border-radius: 7px; background: var(--surface); }
+.nq-unlock-card > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 13px; }
+.nq-unlock-status { font-size: 11px; flex-shrink: 0; }
+.nq-unlock-card p { margin-top: 8px; font-size: 12px; overflow-wrap: anywhere; }
+.nq-empty { padding: 28px 10px; text-align: center; color: var(--text-secondary); font-size: 13px; line-height: 1.8; }
+.nq-footnote, .ping-rollup-note { font-size: 11px; line-height: 1.8; color: var(--text-tertiary); margin: 12px 0; }
+.nq-errors { padding: 12px; border: 1px solid var(--border-subtle); border-radius: 6px; margin-top: 15px; font-size: 12px; overflow-wrap: anywhere; }
+.nq-errors summary { cursor: pointer; }
+.nq-errors ul { padding-left: 20px; margin-top: 8px; list-style: disc; }
+:root[data-appearance="dark"] .nq-unlock-status.is-available { color: #73c69a; }
+:root[data-appearance="dark"] :is(.nq-warning, .nq-status.is-partial, .nq-unlock-status.is-restricted) { color: #e7ba64; }
+@media(max-width: 640px) {
+  .nq-mobile-carriers { display: flex; gap: 6px; padding-bottom: 12px; }
+  .nq-carrier-hidden { display: none; }
+  .nq-table-wrap { max-height: 560px; }
+  .nq-route-table th:first-child { width: 64px; }
+  .nq-route-table th, .nq-route-table td { padding: 10px; }
+  .nq-toolbar { align-items: flex-start; }
+  .nq-history { flex-direction: column; align-items: flex-start; width: 100%; }
+  .nq-history select { width: 100%; }
+}

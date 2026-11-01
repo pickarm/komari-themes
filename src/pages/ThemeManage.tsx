@@ -277,6 +277,9 @@ function applyAvailableClientAssignments(
 // 刻意不标注返回类型:让推断给出全字段必填的具体类型,ThemeDraft 才能安全地 Omit/扩展。
 function pickManagedThemeSettings(settings: ResolvedThemeSettings) {
   return {
+    farmSeason: settings.farmSeason,
+    farmAnimations: settings.farmAnimations,
+    showNetworkQuality: settings.showNetworkQuality,
     defaultAppearance: settings.defaultAppearance,
     desktopNodeViewMode: settings.desktopNodeViewMode,
     mobileNodeViewMode: settings.mobileNodeViewMode,
@@ -1792,6 +1795,28 @@ export function ThemeManage() {
               <span>{label}</span>
             </button>
           ))}
+        </div>
+
+        <div className="surface-inset mt-4 grid gap-4 p-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-2 text-sm">
+            <span>庄园季节</span>
+            <select className="farm-setting-select" value={draft.farmSeason}
+              onChange={(event) => patch("farmSeason", event.target.value as ResolvedThemeSettings["farmSeason"])}>
+              <option value="auto">跟随真实月份</option>
+              <option value="spring">春日花园</option><option value="summer">夏日牧场</option>
+              <option value="autumn">秋日丰收</option><option value="winter">冬日雪原</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={draft.farmAnimations}
+              onChange={(event) => patch("farmAnimations", event.target.checked)} />
+            轻柔场景动效（遵循系统减弱动态效果设置）
+          </label>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+            <input type="checkbox" checked={draft.showNetworkQuality}
+              onChange={(event) => patch("showNetworkQuality", event.target.checked)} />
+            在节点图表下展示网络检测历史（需安装网络检测插件）
+          </label>
         </div>
 
         <div className="surface-inset mt-4 flex flex-col gap-3 px-4 py-4">

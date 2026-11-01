@@ -7,6 +7,14 @@ import type { ResolvedAppearance } from "@/utils/background";
 // farm 场景的昼/夕按本地真实时间划分：6:00–18:00 为昼，其余为夕（含夜晚）。
 const FARM_DAY_START_HOUR = 6;
 const FARM_DAY_END_HOUR = 18;
+const FARM_CONTROLS_KEY = "pickarm:junimo:farm";
+let farmSeasonOverride = "auto";
+let farmAnimations = true;
+try {
+  const cached = JSON.parse(localStorage.getItem(FARM_CONTROLS_KEY) ?? "{}");
+  if (["spring", "summer", "autumn", "winter"].includes(cached.season)) farmSeasonOverride = cached.season;
+  farmAnimations = cached.animations !== false;
+} catch { /* Private browsing can disable storage. */ }
 
 export function farmSceneOf(date: Date = new Date()): FarmScene {
   const hour = date.getHours();
@@ -151,7 +159,8 @@ function applyResolvedAppearance(
   root.dataset.appearance = resolvedAppearance;
   if (farmScene) {
     root.dataset.farmScene = farmScene;
-    root.dataset.farmSeason = farmSeasonOf();
+    root.dataset.farmSeason = farmSeasonOverride === "auto" ? farmSeasonOf() : farmSeasonOverride;
+    root.dataset.farmMotion = farmAnimations ? "on" : "off";
   } else {
     delete root.dataset.farmScene;
     delete root.dataset.farmSeason;
@@ -282,6 +291,17 @@ function getSnapshot() {
 export function usePreferences() {
   const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const themeSettings = useThemeSettings();
+
+  useEffect(() => {
+    if (!themeSettings.isReady) return;
+    if (farmSeasonOverride === themeSettings.farmSeason && farmAnimations === themeSettings.farmAnimations) return;
+    farmSeasonOverride = themeSettings.farmSeason;
+    farmAnimations = themeSettings.farmAnimations;
+    try {
+      localStorage.setItem(FARM_CONTROLS_KEY, JSON.stringify({ season: farmSeasonOverride, animations: farmAnimations }));
+    } catch { /* Use in-memory preferences when storage is unavailable. */ }
+    applyResolvedAppearance(snapshot.resolvedAppearance, snapshot.farmScene);
+  }, [themeSettings.isReady, themeSettings.farmSeason, themeSettings.farmAnimations]);
 
   useEffect(() => {
     if (!themeSettings.isReady) return;

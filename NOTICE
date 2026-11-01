@@ -1,0 +1,8 @@
+Junimo 庄园 2.1.0
+Derived from Junimo v2.0.2 by Planck: https://github.com/vaspike/junimo
+Junimo credits Komari-Theme-LuminaPlus by shanyang242.
+Modifications by pickarm: network-quality report integration, 30-day Ping ranges,
+farm appearance controls and visual refinements, packaging and documentation.
+The upstream Apache License 2.0 is preserved in LICENSE.
+Fusion Pixel font is distributed under its OFL license in dist/fonts/.
+This project is an independent fan-inspired interface, not an official Stardew Valley product.

@@ -1,9 +1,9 @@
 {
-  "name": "junimo",
-  "short": "Junimo",
-  "description": "junimo",
-  "version": "2.0.2",
-  "author": "Planck",
-  "url": "https://github.com/vaspike/junimo",
+  "name": "Junimo 庄园",
+  "short": "pickarm-junimo",
+  "description": "基于 Junimo 的像素庄园主题，集成网络质量与解锁检测历史。",
+  "version": "2.1.0",
+  "author": "pickarm · 原作者 Planck",
+  "url": "https://github.com/pickarm/junimo",
   "preview": "preview.png"
 }

@@ -1,6 +1,38 @@
-# Junimo
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/vaspike/junimo/total?style=for-the-badge&color=orange)
+# Junimo 庄园 · pickarm
 
+基于 [Planck / Junimo v2.0.2](https://github.com/vaspike/junimo) 二次开发，Apache 2.0 许可和上游署名保留。新增网络检测档案、30 天 Ping 范围、手动季节和动效控制。此界面使用原创 CSS / SVG 与开放字体，没有打包游戏原版美术素材。
+
+## 安装与回退
+
+1. 在 Komari 1.6.1 或更新版本的主题管理中安装 release 的 `pickarm-junimo-v2.1.0.zip`。新主题 short 为 `pickarm-junimo`，与原 Junimo 并排安装。
+2. 切换前备份原主题 ZIP 和完整 `theme_settings`。新 short 的配置独立存储，需要把原配置完整复制到新主题后保存，保留 Ping 任务绑定、隐藏节点、背景和布局等旧设置。不要只复制新增字段或覆盖站点其它配置。
+3. 在前台主题管理中选择季节（默认跟随真实月份）、动效（默认开启，系统减弱动态效果优先）和网络检测展示（默认开启）。已有用户主动选择的浅色/深色等外观仍然保留。
+4. 需要回退时，在 Komari 后台切回原 Junimo 即可。不要删除旧主题或其配置，直到确认新版本符合预期。
+
+## 网络检测插件
+
+检测由独立的 `network-quality` 插件负责；主题只读取已保存结果。需从 [pickarm/komari-plugins](https://github.com/pickarm/komari-plugins) 安装插件并在后台配置检测节点、定时任务与公开范围。访问或刷新前台不会执行远程命令。
+
+- 面板位于节点详情的负载 / Ping 图表下方，支持 IPv4 / IPv6、三网三十一省线路与延迟丢包、解锁项目及历史选择。
+- 手机端通过运营商按钮查看对应表格；桌面端可同时比较三网。
+- `—` 是缺测，0 毫秒或 0% 是真实数值；无响应与未检测分别显示。前台不会补造线路、延迟、丢包或解锁状态。
+- 检测失败保留插件提供的历史记录，展示检测时间、部分完成及错误说明。检测数据反映当时结果，探测目标屏蔽/限速可能导致无响应。
+- 主题访问同源只读接口 `GET /api/plugins/network-quality/v1/public?uuid=<节点UUID>&report_id=<可选历史ID>`，支持 `version: 1`；隐藏节点或未安装时的 404 统一显示暂无公开结果，关闭时显示已关闭。
+- 没有安装插件时，其它节点功能正常使用；可在主题管理中关闭面板。
+
+## Ping 历史
+
+最多提供 30 天快捷范围，并根据后端保留时间过滤。长周期按后端指标桶粒度汇总，面板会提示精度；增加范围不会恢复已被删除或从未采集的记录。
+
+## 开发与打包
+
+使用 Node.js 22：`npm ci`，依次运行 `npm run lint`、`npm test`、`npm run typecheck`、`npm run package`。安装包包含 `komari-theme.json`、`preview.png`、`dist/`、Apache `LICENSE` 与 `NOTICE`。字体 OFL 许可随 `dist/fonts/` 分发。
+
+---
+
+以下保留原项目介绍：
+
+# Junimo
 Junimo是一款灵感来自`星露谷物语`的komari主题, 名称取自星露谷里那些住在农场上、默默帮你收菜(采集服务器数据)的小精灵。
 
 > Junimo是站在前人的肩膀上进行的实现, 感谢: [Komari-Theme-LuminaPlus](https://github.com/shanyang242/Komari-Theme-LuminaPlus)
@@ -8,7 +40,6 @@ Junimo是一款灵感来自`星露谷物语`的komari主题, 名称取自星露�
 > 因此Junimo继承了上游主题的大部分能力
 
 ## 预览
-![](./preview.png)
 
 <img width="1768" height="1113" alt="image" src="https://github.com/user-attachments/assets/4975ffe4-b3e7-4b19-91de-ecba5bd5656b" />
 

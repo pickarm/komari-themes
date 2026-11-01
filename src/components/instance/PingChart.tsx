@@ -490,6 +490,7 @@ export function PingChart({
 
   return (
     <InstancePanel title="Ping 图表" description={coverageLabel ?? undefined}>
+      {hours > 168 && <p className="ping-rollup-note">长周期数据可能按小时或天汇总，曲线不代表每一次原始探测；丢包率以服务端统计为准。</p>}
       <div className="instance-ping-toolbar">
         <SwitchToggle
           label="削峰平滑"

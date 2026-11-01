@@ -8,7 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "komari-theme.json"), "utf8"));
 const version = manifest.version ?? "0.0.0";
-const packageName = manifest.name ?? "Komari-Theme-LuminaPlus";
+const packageName = manifest.short ?? manifest.name ?? "pickarm-junimo";
 const outPath = resolve(root, `${packageName}-v${version}.zip`);
 const ZIP_VERSION = 20;
 const UTF8_FLAG = 0x0800;
@@ -59,6 +59,8 @@ for (const [path, hint] of [
 }
 
 const entries = [
+  { path: "LICENSE", full: resolve(root, "LICENSE") },
+  { path: "NOTICE", full: resolve(root, "NOTICE") },
   { path: "komari-theme.json", full: resolve(root, "komari-theme.json") },
   { path: "preview.png", full: previewPath },
   ...walk(distDir, root),

@@ -14,12 +14,12 @@
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     <link rel="apple-touch-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon.ico" />
-    <meta property="og:title" content="lumina-pro" />
+    <meta property="og:title" content="Junimo 庄园" />
     <meta property="og:description" content="A Komari monitor theme." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="lumina-pro" />
+    <meta name="twitter:title" content="Junimo 庄园" />
     <meta name="twitter:description" content="A Komari monitor theme." />
-    <title>lumina-pro</title>
+    <title>Junimo 庄园</title>
     <meta name="description" content="A Komari monitor theme." />
     <script>
       (() => {
@@ -50,6 +50,9 @@
               : "light"
             : appearance;
         document.documentElement.dataset.appearance = resolved;
+        let farmControls = {};
+        try { farmControls = JSON.parse(localStorage.getItem("pickarm:junimo:farm") ?? "{}"); } catch {}
+        document.documentElement.dataset.farmMotion = farmControls.animations === false ? "off" : "on";
         // farm 主题的昼/夕场景按本地时间（6:00–18:00 为昼）划分，季节按真实月份，
         // 与 usePreferences 保持一致。
         let farmScene = null;
@@ -67,6 +70,9 @@
                 : month >= 8 && month <= 10
                   ? "autumn"
                   : "winter";
+          if (["spring", "summer", "autumn", "winter"].includes(farmControls.season)) {
+            document.documentElement.dataset.farmSeason = farmControls.season;
+          }
         }
         document.documentElement.style.colorScheme = resolved === "dark" ? "dark" : "light";
         const meta = document.querySelector('meta[name="theme-color"]');

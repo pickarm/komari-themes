@@ -119,6 +119,9 @@ export interface HomepageMultiPingGroup {
 }
 
 export interface ThemeSettings {
+  farmSeason?: "auto" | "spring" | "summer" | "autumn" | "winter";
+  farmAnimations?: boolean;
+  showNetworkQuality?: boolean;
   defaultAppearance?: "system" | "light" | "dark" | "farm";
   desktopNodeViewMode?: "large" | "compact" | "mini" | "list";
   mobileNodeViewMode?: "large" | "compact" | "mini" | "list";

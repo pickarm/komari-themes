@@ -5,6 +5,12 @@ import {
 } from "@/utils/themeSettings";
 
 describe("normalizeThemeSettings", () => {
+  it("adds manor controls without requiring changes to existing saved configurations", () => {
+    expect(normalizeThemeSettings({})).toMatchObject({ farmSeason: "auto", farmAnimations: true, showNetworkQuality: true });
+    expect(normalizeThemeSettings({ farmSeason: "winter", farmAnimations: false, showNetworkQuality: false }))
+      .toMatchObject({ farmSeason: "winter", farmAnimations: false, showNetworkQuality: false });
+    expect(normalizeThemeSettings({ farmSeason: "unknown" } as never).farmSeason).toBe("auto");
+  });
   it("keeps mini and falls unknown saved view modes back to compact", () => {
     const settings = normalizeThemeSettings({
       desktopNodeViewMode: "retired-view",

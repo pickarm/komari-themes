@@ -5,6 +5,7 @@ import "uplot/dist/uPlot.min.css";
 import { InstanceDetails } from "@/components/instance/InstanceDetails";
 import { PingChart } from "@/components/instance/PingChart";
 import { LoadChart } from "@/components/instance/LoadChart";
+import { NetworkQualityPanel } from "@/components/instance/NetworkQualityPanel";
 import { Spinner } from "@/components/ui/Spinner";
 import {
   buildLoadTimeRangeOptions,
@@ -204,6 +205,7 @@ export function Instance() {
           ) : null}
         </div>
       </div>
+      {themeSettings.showNetworkQuality && <NetworkQualityPanel key={uuid} uuid={uuid} />}
     </div>
   );
 }
