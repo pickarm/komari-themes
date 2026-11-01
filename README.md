@@ -1,4 +1,19 @@
-# Junimo 庄园 · pickarm
+# pickarm 的 Komari 主题合集
+
+主题仓库由 `pickarm/junimo` 更名为 `pickarm/komari-themes`，保留原 Fork、历史提交与发布包。根目录 `v1.json` 为多主题市场目录，后续新主题可持续加入同一个源。
+
+在 Komari 后台 → 主题市场 → 管理源中添加：
+
+- 名称：`pickarm 自用主题`
+- 地址：`https://raw.githubusercontent.com/pickarm/komari-themes/main/v1.json`
+
+| 主题 | 最新版本 | 源码位置 |
+| --- | --- | --- |
+| Junimo 庄园 | 2.1.0 | 当前仓库根目录，保留与上游同步能力 |
+
+新增主题可在 `themes/<short>/` 中独立维护源码和构建流程，将安装包地址、SHA-256 与预览图加入 `v1.json` 的 `themes` 数组。现有 Junimo 安装包保持原样，目录使用已下载核验的 GitHub 发布包校验值；源码中的仓库 URL 已更新为新名称。
+
+## Junimo 庄园 · pickarm
 
 基于 [Planck / Junimo v2.0.2](https://github.com/vaspike/junimo) 二次开发，Apache 2.0 许可和上游署名保留。新增网络检测档案、30 天 Ping 范围、手动季节和动效控制。此界面使用原创 CSS / SVG 与开放字体，没有打包游戏原版美术素材。
 

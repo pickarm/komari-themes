@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "themes": [
+    {
+      "name": { "zh-CN": "Junimo 庄园", "en": "Junimo Manor" },
+      "short": "pickarm-junimo",
+      "description": {
+        "zh-CN": "星露谷农场风格增强，支持四季手选、手机布局、30天Ping，以及网络检测插件的三网回程、解锁和历史面板。",
+        "en": "Farm-style theme with seasons, 30-day Ping history and saved network quality reports."
+      },
+      "version": "2.1.0",
+      "author": "pickarm · 原作者 Planck",
+      "url": "https://github.com/pickarm/komari-themes",
+      "preview": "https://github.com/pickarm/komari-themes/releases/download/v2.1.0/preview.png",
+      "download": "https://github.com/pickarm/komari-themes/releases/download/v2.1.0/pickarm-junimo-v2.1.0.zip",
+      "sha256": "8b0d31267b0682af4da038823d72c99b7741d7ba477f9b388c559994f9f611d8"
+    }
+  ]
+}
