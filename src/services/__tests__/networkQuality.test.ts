@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NetworkPublicSchema, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, routeFor } from "../networkQuality";
+import { NetworkPublicSchema, NetworkUnavailable, formatLatency, formatLoss, getNetworkQuality, packetLabel, reportAge, routeFor, routeHealth, routeSummary, visibleProvinces, type NetworkRoute } from "../networkQuality";
 
 const report = {
   id: "run-1", uuid: "node-a", startedAt: "2026-11-01T00:00:00Z", completedAt: "2026-11-01T00:02:00Z",
@@ -48,5 +48,55 @@ describe("network report public contract", () => {
     await expect(getNetworkQuality("node-a", "")).rejects.toBeInstanceOf(NetworkUnavailable);
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...payload, latest: { ...report, uuid: "node-b" } }))));
     await expect(getNetworkQuality("node-a", "")).rejects.toThrow("当前节点不匹配");
+  });
+});
+
+const normal: NetworkRoute = { province: "北京", carrier: "电信", family: 4, line: "CN2 GIA", latency: 100, loss: 0, sent: 30, received: 30, status: "ok", packetType: "large" };
+describe("network archive presentation", () => {
+  it("reads packet type on actual route records and distinguishes mixed packet samples", () => {
+    const parsed = NetworkPublicSchema.parse({ ...payload, latest: { ...report, routes: [normal] } });
+    if (!parsed.enabled || !parsed.latest) throw new Error("missing fixture");
+    expect(parsed.latest.routes[0].packetType).toBe("large");
+    expect(packetLabel(parsed.latest, 4)).toBe("IPv4 TCP 大包探测");
+    expect(packetLabel({ routes: [normal, { ...normal, province: "天津", packetType: "standard" }] }, 4)).toContain("混合包型");
+    expect(packetLabel({ routes: [{ ...normal, family: 6, packetType: "standard" }] }, 6)).toBe("IPv6 标准 TCP 探测");
+    expect(routeFor([{ ...normal, packetType: "standard" }, normal], "北京", "电信", 4)?.packetType).toBe("large");
+  });
+  it("does not classify missing/unsupported/invalid samples as healthy, including legitimate zeroes", () => {
+    expect(routeHealth(undefined)).toBe("unknown");
+    expect(routeHealth({ ...normal, status: "unsupported" })).toBe("unknown");
+    expect(routeHealth({ ...normal, latency: null, loss: null })).toBe("unknown");
+    expect(routeHealth({ ...normal, latency: -1, loss: 101 })).toBe("unknown");
+    expect(routeHealth({ ...normal, latency: 0, loss: 0 })).toBe("normal");
+    expect(routeHealth({ ...normal, latency: 150, loss: 0 })).toBe("normal");
+    expect(routeHealth({ ...normal, latency: 240, loss: 20 })).toBe("caution");
+    expect(routeHealth({ ...normal, latency: 241 })).toBe("critical");
+    expect(routeHealth({ ...normal, latency: null, loss: 100, status: "no-response" })).toBe("critical");
+  });
+  it("filters only abnormal provinces within selected family and mobile carrier scope", () => {
+    const routes: NetworkRoute[] = [normal, { ...normal, province: "天津", carrier: "移动", loss: 30 }, { ...normal, province: "上海", family: 6, status: "failed" }, { ...normal, province: "广东", loss: 5 }, { ...normal, province: "广西", status: "unsupported" }];
+    expect(visibleProvinces(routes, 4, undefined, true, "province")).toEqual(["天津"]);
+    expect(visibleProvinces(routes, 4, "电信", true, "province")).toEqual([]);
+    expect(visibleProvinces(routes, 4, "移动", true, "province")).toEqual(["天津"]);
+    expect(visibleProvinces(routes, 6, undefined, true, "province")).toEqual(["上海"]);
+    expect(visibleProvinces(routes, 4, undefined, false, "province")).toHaveLength(31);
+  });
+  it("sorts by worst valid metric with stable ties; missing values stay last", () => {
+    const routes: NetworkRoute[] = [normal, { ...normal, province: "天津", loss: 30, latency: 270 }, { ...normal, province: "河北", loss: 30, latency: 90 }, { ...normal, province: "广东", carrier: "移动", loss: null, latency: 400 }];
+    expect(visibleProvinces(routes, 4, undefined, false, "loss").slice(0, 3)).toEqual(["天津", "河北", "北京"]);
+    expect(visibleProvinces(routes, 4, undefined, false, "latency").slice(0, 3)).toEqual(["广东", "天津", "北京"]);
+    expect(visibleProvinces(routes, 4, "电信", false, "latency").slice(0, 3)).toEqual(["天津", "北京", "河北"]);
+  });
+  it("counts canonical 93 targets once and keeps missing targets visible in coverage", () => {
+    const routes: NetworkRoute[] = [normal, normal, { ...normal, carrier: "移动", status: "no-response", loss: 100, received: 0 }, { ...normal, family: 6, status: "failed" }];
+    expect(routeSummary(routes, 4)).toEqual({ total: 93, measured: 2, critical: 1, unknown: 91 });
+    expect(routeSummary(routes, 4, "电信")).toEqual({ total: 31, measured: 1, critical: 0, unknown: 30 });
+  });
+  it("labels stale archives without pretending to know the current network state", () => {
+    const now = Date.parse("2026-11-02T03:00:00Z");
+    expect(reportAge("2026-11-01T03:00:00Z", now)).toEqual({ label: "1 天前检测", stale: true });
+    expect(reportAge("2026-11-02T02:59:40Z", now)).toEqual({ label: "刚刚归档", stale: false });
+    expect(reportAge("not-a-date", now).label).toBe("检测时间待核实");
+    expect(reportAge("2026-12-01T00:00:00Z", now).label).toBe("检测时间待核实");
   });
 });

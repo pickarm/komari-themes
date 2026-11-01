@@ -4,9 +4,7 @@ import { subscribeMediaQuery } from "@/utils/mediaQuery";
 import { isAppearance, type Appearance, type FarmScene } from "@/utils/themeSettings";
 import type { ResolvedAppearance } from "@/utils/background";
 
-// farm 场景的昼/夕按本地真实时间划分：6:00–18:00 为昼，其余为夕（含夜晚）。
-const FARM_DAY_START_HOUR = 6;
-const FARM_DAY_END_HOUR = 18;
+import { farmSceneOf, farmSeasonOf, msUntilNextFarmBoundary } from "@/utils/farmCalendar";
 const FARM_CONTROLS_KEY = "pickarm:junimo:farm";
 let farmSeasonOverride = "auto";
 let farmAnimations = true;
@@ -15,37 +13,6 @@ try {
   if (["spring", "summer", "autumn", "winter"].includes(cached.season)) farmSeasonOverride = cached.season;
   farmAnimations = cached.animations !== false;
 } catch { /* Private browsing can disable storage. */ }
-
-export function farmSceneOf(date: Date = new Date()): FarmScene {
-  const hour = date.getHours();
-  return hour >= FARM_DAY_START_HOUR && hour < FARM_DAY_END_HOUR ? "day" : "dusk";
-}
-
-// 真实月份 → 农场四季：3–5 春 / 6–8 夏 / 9–11 秋 / 12–2 冬。只影响场景配色
-//（天色 / 草地 / 栅栏 / 野花），卡片与其他外观不变。
-export type FarmSeason = "spring" | "summer" | "autumn" | "winter";
-
-export function farmSeasonOf(date: Date = new Date()): FarmSeason {
-  const month = date.getMonth();
-  if (month >= 2 && month <= 4) return "spring";
-  if (month >= 5 && month <= 7) return "summer";
-  if (month >= 8 && month <= 10) return "autumn";
-  return "winter";
-}
-
-/** 距下一个昼/夕边界（6:00 或 18:00）的毫秒数，+1s 余量避免卡在边界前。 */
-function msUntilNextFarmBoundary(now: Date = new Date()): number {
-  const hour = now.getHours();
-  const nextHour =
-    hour < FARM_DAY_START_HOUR
-      ? FARM_DAY_START_HOUR
-      : hour < FARM_DAY_END_HOUR
-        ? FARM_DAY_END_HOUR
-        : 24 + FARM_DAY_START_HOUR;
-  const next = new Date(now);
-  next.setHours(nextHour, 0, 1, 0); // setHours(30) 会自动进位到次日 6 点
-  return next.getTime() - now.getTime();
-}
 
 const APPEARANCE_STORAGE_KEY = "appearance";
 const APPEARANCE_DEFAULT_STORAGE_KEY = "appearance_default";
@@ -181,7 +148,7 @@ function applyResolvedAppearance(
 
 let farmSceneTimer: number | null = null;
 
-/** farm 外观下挂一个到下一个昼/夕边界的定时器，到点重放 commit 以翻转场景。 */
+/** farm 外观下挂一个到下一个本地午夜或昼/夕边界的定时器，到点重放 commit 以翻转场景。 */
 function scheduleFarmSceneTimer() {
   if (farmSceneTimer != null) {
     window.clearTimeout(farmSceneTimer);

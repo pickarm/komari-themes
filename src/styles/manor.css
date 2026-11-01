@@ -9,7 +9,7 @@
 :root[data-appearance="farm"] .instance-panel-header { border-bottom: 1px dashed #a6783c66; padding-bottom: 12px; margin-bottom: 16px; }
 :root[data-appearance="farm"] .instance-panel-kicker { color: #807135; letter-spacing: 1px; }
 :root[data-appearance="farm"] :is(.instance-segmented, .nq-tabs > div, .nq-mobile-carriers) { background: #e6cc9040; padding: 4px; border-radius: 5px; }
-:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .farm-setting-select, .nq-history select) {
+:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .farm-setting-select, .nq-history select, .nq-sort select, .instance-segmented button, .instance-toggle-button) {
   border: 2px solid #ad7a42; border-radius: 4px; box-shadow: inset 1px 1px #fff8da, 0 2px 0 #75462244;
 }
 :root[data-appearance="farm"] :is(.nq-tabs button, .nq-mobile-carriers button)[aria-pressed="true"] { background: #e7c071; border-color: #774824; color: #4a2c17; }
@@ -30,3 +30,37 @@
   :root[data-appearance="farm"] *, :root[data-appearance="farm"] *::before, :root[data-appearance="farm"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 :root[data-farm-motion="off"][data-appearance="farm"] *, :root[data-farm-motion="off"][data-appearance="farm"] *::before, :root[data-farm-motion="off"][data-appearance="farm"] *::after { animation: none !important; }
+
+/* Shared integer-pixel controls; titles stay pixelated, data stays legible. */
+:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .farm-setting-select, .nq-history select, .nq-sort select, .instance-segmented button, .instance-toggle-button) {
+  background: linear-gradient(#fff5d9, #f0dba5); color: #593716; min-height: 36px; transition: background-color 120ms, transform 120ms;
+}
+:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .instance-segmented button, .instance-toggle-button):hover:not(:disabled) { border-color: #6f4220; background: #fff4ce; }
+:root[data-appearance="farm"] :is(.nq-refresh, .nq-tabs button, .nq-mobile-carriers button, .instance-segmented button, .instance-toggle-button):active:not(:disabled) { transform: translateY(2px); box-shadow: inset 1px 1px #bd9659; }
+:root[data-appearance="farm"] :is(.nq-tabs button, .nq-mobile-carriers button)[aria-pressed="true"],
+:root[data-appearance="farm"] :is(.instance-segmented button, .instance-toggle-button)[data-active="true"] { background: #e6bf70; border-color: #774824; box-shadow: inset 1px 2px #b78947; }
+:root[data-appearance="farm"] :is(button, select, input):focus-visible { outline: 3px solid #386752; outline-offset: 3px; }
+:root[data-appearance="farm"] button:disabled { cursor: default; opacity: .5; box-shadow: none; }
+:root[data-appearance="farm"] .nq-summary { border: 2px solid #c6a264; background: #efdda9; border-radius: 3px; box-shadow: inset 1px 1px #fff5cd; }
+:root[data-appearance="farm"] .nq-summary dt { letter-spacing: .03em; }
+:root[data-appearance="farm"] .nq-table-wrap { border: 2px solid #b38b50; border-radius: 3px; }
+:root[data-appearance="farm"] .nq-route-table tbody tr:hover td { background: #ebd59f; }
+:root[data-appearance="farm"] .nq-unlock-card.is-available { border-top: 4px solid #62843d; }
+:root[data-appearance="farm"] .nq-unlock-card.is-restricted { border-top: 4px solid #b87b37; }
+:root[data-appearance="farm"] .nq-notice { background: #ead5a0; border-color: #b87b37; }
+:root[data-appearance="farm"][data-farm-motion="on"] .nq-leaf-loading { animation: manor-sprout 1.6s steps(4) infinite; transform-origin: bottom; }
+/* Original landscape, drawn locally; custom user backgrounds take precedence. */
+:root[data-appearance="farm"] { --manor-landscape: url("../assets/scenes/manor-spring.svg"); }
+:root[data-appearance="farm"][data-farm-season="summer"] { --manor-landscape: url("../assets/scenes/manor-summer.svg"); }
+:root[data-appearance="farm"][data-farm-season="autumn"] { --manor-landscape: url("../assets/scenes/manor-autumn.svg"); }
+:root[data-appearance="farm"][data-farm-season="winter"] { --manor-landscape: url("../assets/scenes/manor-winter.svg"); }
+html[data-appearance="farm"]:not([data-bg-image]) body::after { background: var(--manor-landscape) center / 100% 100% no-repeat; image-rendering: pixelated; }
+html[data-appearance="farm"][data-farm-scene="dusk"]:not([data-bg-image]) body::after { filter: brightness(.62) saturate(.75); }
+@media(max-width: 640px) {
+  :root[data-appearance="farm"] .nq-tabs button { min-height: 40px; }
+  :root[data-appearance="farm"] .nq-mobile-carriers { display: flex; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  :root[data-appearance="farm"] .nq-leaf-loading { animation: none !important; }
+}

@@ -1802,10 +1802,11 @@ export function ThemeManage() {
             <span>庄园季节</span>
             <select className="farm-setting-select" value={draft.farmSeason}
               onChange={(event) => patch("farmSeason", event.target.value as ResolvedThemeSettings["farmSeason"])}>
-              <option value="auto">跟随真实月份</option>
+              <option value="auto">自动 · 按访客浏览器日期</option>
               <option value="spring">春日花园</option><option value="summer">夏日牧场</option>
               <option value="autumn">秋日丰收</option><option value="winter">冬日雪原</option>
             </select>
+            <small className="text-[var(--text-tertiary)]">默认随访客本地日期切换：3–5 月春、6–8 月夏、9–11 月秋、12–2 月冬。</small>
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={draft.farmAnimations}
